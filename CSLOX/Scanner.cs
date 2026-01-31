@@ -76,6 +76,30 @@ namespace CSLOX
                 case '>':
                     AddToken(Match('=') ? TokenType.GREATER_EQUAL : TokenType.GREATER);
                     break;
+
+                // Comments and Divide (/)
+                case '/':
+                    if (Match('/'))
+                    {
+                        while (Peek() != '\n' && !IsAtEnd())
+                        {
+                            Advance();
+                        }
+                    }
+                    else
+                    {
+                        AddToken(TokenType.SLASH);
+                    }
+                    break;
+                // Useless Characters:
+                case ' ':
+                case '\r':
+                case '\t':
+                    // Ignore Whitespaces.
+                    break;
+                case '\n':
+                    _line++;
+                    break;
                 default:
                     CSLOX.Program.Error(_line, "Unexpected Character."); // Raziel: Double Check this Reference.
                     break;
@@ -111,6 +135,19 @@ namespace CSLOX
             }
             _current++;
             return true;
+        }
+
+        // Peek is called Lookahead.
+        // Usually the Lookahead is done one character at the time.
+        // This will warranty speed on the scaner.
+        // The more Characters ahead the slower is the scnner.
+        private char Peek()
+        {
+            if (IsAtEnd())
+            {
+                return '\0';
+            }
+            return _source.ElementAt(_current);
         }
     }
 }
