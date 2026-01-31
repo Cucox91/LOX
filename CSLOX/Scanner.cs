@@ -9,12 +9,33 @@ namespace CSLOX
         private int _current;
         private int _line;
 
+        private readonly Dictionary<string, TokenType?> _keywords =
+            new Dictionary<string, TokenType?>();
+
         public Scanner(string source)
         {
             _source = source;
             _start = 0;
             _current = 0;
             _line = 1;
+
+            // Adding Keywords to Dictionary.
+            _keywords.Add("and", TokenType.AND);
+            _keywords.Add("class", TokenType.CLASS);
+            _keywords.Add("else", TokenType.ELSE);
+            _keywords.Add("false", TokenType.FALSE);
+            _keywords.Add("for", TokenType.FOR);
+            _keywords.Add("fun", TokenType.FUN);
+            _keywords.Add("if", TokenType.IF);
+            _keywords.Add("nil", TokenType.NIL);
+            _keywords.Add("or", TokenType.OR);
+            _keywords.Add("print", TokenType.PRINT);
+            _keywords.Add("return", TokenType.RETURN);
+            _keywords.Add("super", TokenType.SUPER);
+            _keywords.Add("this", TokenType.THIS);
+            _keywords.Add("true", TokenType.TRUE);
+            _keywords.Add("var", TokenType.VAR);
+            _keywords.Add("while", TokenType.WHILE);
         }
 
         public List<Token> ScanTokens()
@@ -100,8 +121,32 @@ namespace CSLOX
                 case '\n':
                     _line++;
                     break;
+                // Strings Literals.
+                case '"':
+                    AddString();
+                    break;
+                // The code below for the 'or' is not valid.
+                // There is a principle called 'Maximal Munch'.
+                //case 'o':
+                //if(Match('r'))
+                //{
+                //  AddToken(TokenType.OR);
+                //}
+                //break;
                 default:
-                    CSLOX.Program.Error(_line, "Unexpected Character."); // Raziel: Double Check this Reference.
+                    if (IsDigit(c))
+                    {
+                        Number();
+                    }
+                    else if (IsAlpha(c))
+                    {
+                        Identifier();
+                    }
+                    else
+                    {
+                        // Raziel: Double Check this Reference.
+                        CSLOX.Program.Error(_line, "Unexpected Character.");
+                    }
                     break;
             }
         }
@@ -118,7 +163,7 @@ namespace CSLOX
 
         private void AddToken(TokenType tokenType, object? literal = null)
         {
-            string text = _source.Substring(_start, _current);
+            string text = _source.Substring(_start, _current - _start);
             _tokens.Add(new Token(tokenType, text, literal, _line));
         }
 
@@ -149,6 +194,98 @@ namespace CSLOX
             }
             return _source.ElementAt(_current);
         }
+
+        private void AddString()
+        {
+            while (Peek() != '"' && !IsAtEnd())
+            {
+                if (Peek() == '\n')
+                {
+                    _line++;
+                }
+
+                Advance();
+            }
+
+            if (IsAtEnd())
+            {
+                CSLOX.Program.Error(_line, "Unterminated String.");
+                return;
+            }
+
+            // Moving from the closing ".
+            Advance();
+
+            // Hint: If we want to support escape sequences
+            // This is the place to do it.
+            // Or if we want to use the $"{}" Style, it should be here to.
+
+            // Get the values inside the "" only. That is why we do +1 and -1.
+            string stringValue = _source.Substring(_start + 1, (_current - _start) - 1);
+            AddToken(TokenType.STRING, stringValue);
+        }
+
+        private bool IsDigit(char character)
+        {
+            return character >= '0' && character <= '9';
+        }
+
+        private void Number()
+        {
+            while (IsDigit(Peek()))
+            {
+                Advance();
+            }
+
+            if (Peek() == '.' && IsDigit(PeekNext()))
+            {
+                // Consume the ".".
+                Advance();
+            }
+
+            while (IsDigit(Peek()))
+            {
+                Advance();
+            }
+
+            AddToken(TokenType.NUMBER, double.Parse(_source.Substring(_start, _current - _start)));
+        }
+
+        private char PeekNext()
+        {
+            if (_current + 1 >= _source.Length)
+            {
+                return '\0';
+            }
+
+            return _source.ElementAt(_current + 1);
+        }
+
+        private void Identifier()
+        {
+            while (IsAlphaNumeric(Peek()))
+            {
+                Advance();
+            }
+
+            string text = _source.Substring(_start, _current - _start);
+            TokenType? tokenType = _keywords[text];
+            if (tokenType == null)
+            {
+                tokenType = TokenType.IDENTIFIER;
+            }
+
+            AddToken(tokenType.Value);
+        }
+
+        private bool IsAlpha(char c)
+        {
+            return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') && c == '_';
+        }
+
+        private bool IsAlphaNumeric(char c)
+        {
+            return IsAlpha(c) || IsDigit(c);
+        }
     }
 }
-
