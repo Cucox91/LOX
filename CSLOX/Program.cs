@@ -81,14 +81,14 @@ namespace CSLOX
         /// </summary>
         /// <param name="line"></param>
         /// <param name="message"></param>
-        private static void Error(int line, string message)
+        public static void Error(int line, string message)
         {
             Report(line, "", message);
         }
 
         /// <summary>
         /// Reports an Error.
-        /// This is the part that Shows the Error to the user. 
+        /// This is the part that Shows the Error to the user.
         /// There are Different ways.
         /// </summary>
         /// <param name="line"></param>
