@@ -269,7 +269,7 @@ namespace CSLOX
             }
 
             string text = _source.Substring(_start, _current - _start);
-            TokenType? tokenType = _keywords[text];
+            _keywords.TryGetValue(text, out TokenType? tokenType);
             if (tokenType == null)
             {
                 tokenType = TokenType.IDENTIFIER;

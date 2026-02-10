@@ -16,7 +16,27 @@ namespace CSLOX
             }
             else if (args.Length == 1)
             {
-                RunFile(args[0]);
+                if (args[0] == "Build Tree")
+                {
+                    Expr printExpt = new Binary(
+                        new Unary(
+                            new Token(TokenType.MINUS, "-", null, 1),
+                            new Literal(123)
+                        ),
+                        new Token(TokenType.STAR, "*", null, 1),
+                        new Grouping(
+                            new Literal("45.67")
+                        )
+                    );
+
+                    Console.WriteLine("Priting AST:");
+                    AstPrinter printer = new();
+                    Console.WriteLine(printer.Print(printExpt));
+                }
+                else
+                {
+                    RunFile(args[0]);
+                }
             }
             else
             {
