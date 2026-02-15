@@ -106,6 +106,18 @@ namespace CSLOX
             Report(line, "", message);
         }
 
+        public static void Error(Token token, string message)
+        {
+            if (TokenType.EOF == token.TokenType)
+            {
+                Report(token.Line, " at end", message);
+            }
+            else
+            {
+                Report(token.Line, $" at '{token.Lexeme}'", message);
+            }
+        }
+
         /// <summary>
         /// Reports an Error.
         /// This is the part that Shows the Error to the user.

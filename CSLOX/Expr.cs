@@ -13,10 +13,10 @@ namespace CSLOX
       }
       public record Binary : Expr
       {
-            public Expr Left { get; set; }
+            public Expr? Left { get; set; }
             public Token Oper { get; set; }
-            public Expr Right { get; set; }
-            public Binary(Expr left, Token oper, Expr right)
+            public Expr? Right { get; set; }
+            public Binary(Expr? left, Token oper, Expr? right)
             {
                   Left = left;
                   Oper = oper;
@@ -27,8 +27,8 @@ namespace CSLOX
       }
       public record Grouping : Expr
       {
-            public Expr Expression { get; set; }
-            public Grouping(Expr expression)
+            public Expr? Expression { get; set; }
+            public Grouping(Expr? expression)
             {
                   Expression = expression;
             }
@@ -37,8 +37,8 @@ namespace CSLOX
       }
       public record Literal : Expr
       {
-            public Object Value { get; set; }
-            public Literal(Object value)
+            public Object? Value { get; set; }
+            public Literal(Object? value)
             {
                   Value = value;
             }
@@ -48,8 +48,8 @@ namespace CSLOX
       public record Unary : Expr
       {
             public Token Oper { get; set; }
-            public Expr Right { get; set; }
-            public Unary(Token oper, Expr right)
+            public Expr? Right { get; set; }
+            public Unary(Token oper, Expr? right)
             {
                   Oper = oper;
                   Right = right;
