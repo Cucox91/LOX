@@ -12,6 +12,19 @@ namespace CSLOX
             Tokens = tokens;
         }
 
+        public Expr? Parse()
+        {
+            try
+            {
+                return Expression();
+            }
+            catch (ParseError error)
+            {
+                Console.WriteLine(error.Message);
+                return null;
+            }
+        }
+
         private Expr? Expression()
         {
             return Equality();
@@ -155,8 +168,7 @@ namespace CSLOX
                 return new Grouping(expr);
             }
 
-            // This Case should never happen in theory.
-            return null;
+            throw Error(Peek(), "Expect Expression");
         }
 
         private Token Consume(TokenType tokenType, string message)
@@ -175,10 +187,38 @@ namespace CSLOX
             return new ParseError();
         }
 
+        private void Synchronize()
+        {
+            Advance();
+
+            while (!IsAtEnd())
+            {
+                if (Previous().TokenType == TokenType.SEMICOLON)
+                {
+                    return;
+                }
+
+                switch (Peek().TokenType)
+                {
+                    case TokenType.CLASS:
+                    case TokenType.FUN:
+                    case TokenType.VAR:
+                    case TokenType.FOR:
+                    case TokenType.IF:
+                    case TokenType.WHILE:
+                    case TokenType.PRINT:
+                    case TokenType.RETURN:
+                        return;
+                }
+                Advance();
+            }
+        }
+
         #region ParseError Class...
 
         private class ParseError : Exception
         {
+
         }
 
         #endregion  ParseError Class...

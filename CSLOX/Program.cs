@@ -86,13 +86,20 @@ namespace CSLOX
 
         private static void Run(string source)
         {
+            // Create List of tokens by using the scanner.
             Scanner scanner = new(source);
             List<Token> tokens = scanner.ScanTokens();
 
-            foreach (Token token in tokens)
+            // Take the created list of tokents and pass them to the Parser.
+            Parser parser = new Parser(tokens);
+            var expr = parser.Parse();
+
+            if (_hadErrors || expr == null)
             {
-                Console.WriteLine(token);
+                return;
             }
+
+            Console.WriteLine(new AstPrinter().Print(expr!));
         }
 
         /// <summary>
