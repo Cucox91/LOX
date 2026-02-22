@@ -1,18 +1,21 @@
 ﻿using System;
 using System.Text;
+using static CSLOX.Interpreter;
 
 namespace CSLOX
 {
     public class Program
     {
+        private static Interpreter _interpreter = new Interpreter();
         private static bool _hadErrors = false;
+        private static bool _hadRuntimeErrors = false;
 
         public static void Main(string[] args)
         {
             if (args.Length > 1)
             {
                 Console.WriteLine("Usage: jlox [script]");
-                Environment.Exit(64);
+                Environment.Exit(64); // Raziel: Find the proper code for C#. This is for Java.
             }
             else if (args.Length == 1)
             {
@@ -57,7 +60,12 @@ namespace CSLOX
 
             if (_hadErrors)
             {
-                Environment.Exit(65);
+                Environment.Exit(65); // Raziel: Find the proper code for C#. This is for Java.
+            }
+
+            if (_hadRuntimeErrors)
+            {
+                Environment.Exit(70); // Raziel: Find the proper code for C#. This is for Java.
             }
         }
 
@@ -99,15 +107,10 @@ namespace CSLOX
                 return;
             }
 
-            Console.WriteLine(new AstPrinter().Print(expr!));
+            _interpreter.Interpret(expr);
+            // Console.WriteLine(new AstPrinter().Print(expr!));
         }
 
-        /// <summary>
-        /// Generates an Error.
-        /// This is the part that creates the error based on conditions.
-        /// </summary>
-        /// <param name="line"></param>
-        /// <param name="message"></param>
         public static void Error(int line, string message)
         {
             Report(line, "", message);
@@ -123,6 +126,12 @@ namespace CSLOX
             {
                 Report(token.Line, $" at '{token.Lexeme}'", message);
             }
+        }
+
+        public static void RuntimeError(RuntimeError runtimeError)
+        {
+            Console.Error.WriteLine($"{runtimeError.Message} {Environment.NewLine}[line {runtimeError.Token!.Line}]");
+            _hadRuntimeErrors = true;
         }
 
         /// <summary>

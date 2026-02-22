@@ -1,9 +1,20 @@
-using System.Runtime.InteropServices;
-
 namespace CSLOX
 {
     public class Interpreter : IVisitor<Object>
     {
+        public void Interpret(Expr expr)
+        {
+            try
+            {
+                object value = Evaluate(expr);
+                Console.WriteLine(Stringify(value));
+            }
+            catch (RuntimeError er)
+            {
+                CSLOX.Program.RuntimeError(er);
+            }
+        }
+
         public object VisitBinaryExpr(Binary expr)
         {
             var left = Evaluate(expr.Left);
@@ -149,6 +160,28 @@ namespace CSLOX
 
             throw new RuntimeError(token, "Operands must be a Number");
         }
+
+        private string Stringify(object obj)
+        {
+            if (obj is null)
+            {
+                return "nil";
+            }
+
+            if (obj is double)
+            {
+                var text = obj.ToString() ?? "";
+                if (text.EndsWith(".0"))
+                {
+                    text = text.Substring(0, text.Length - 2);
+                }
+                return text;
+            }
+
+            return obj.ToString() ?? "";
+        }
+
+        
 
         #region Runtime Error Class.
 
