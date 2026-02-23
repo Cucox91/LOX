@@ -2,6 +2,8 @@ namespace CSLOX
 {
     public class Interpreter : IVisitorExpr<object>, IVisitorStmt<object?>
     {
+        private Environm _environment = new Environm();
+
         public void Interpret(List<Stmt> statements)
         {
             try
@@ -121,10 +123,10 @@ namespace CSLOX
             return null!;
         }
 
-        public object? VisitExpressionStmt(Expression stmt)
+        public object VisitVariableExpr(Variable expr)
         {
-            Evaluate(stmt.Expre);
-            return null;
+            // Raziel: Review nullability later on this.
+            return _environment.Get(expr.Name!)!;
         }
 
         private bool IsTruthy(object obj)
@@ -189,7 +191,13 @@ namespace CSLOX
             return obj.ToString() ?? "";
         }
 
-        // Statements Methods:
+        // Statements Methods
+
+        public object? VisitExpressionStmt(Expression stmt)
+        {
+            Evaluate(stmt.Expre);
+            return null;
+        }
 
         public object? VisitPrintStmt(Print stmt)
         {
@@ -207,15 +215,16 @@ namespace CSLOX
                 val = Evaluate(stmt.Initializer);
             }
 
+            _environment.Define(stmt.Name.Lexeme, val);
             return null;
         }
-
-
 
         private void Execute(Stmt statement)
         {
             statement.Accept(this);
         }
+
+
 
         #region Runtime Error Class.
 

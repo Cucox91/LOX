@@ -18,7 +18,7 @@ namespace CSLOX
 
             while (!IsAtEnd())
             {
-                statements.Add(Declaration());
+                statements.Add(Declaration()!);
             }
 
             return statements;

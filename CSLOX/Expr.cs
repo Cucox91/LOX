@@ -63,8 +63,8 @@ namespace CSLOX
 
       public record Variable : Expr
       {
-            public Object? Name { get; set; }
-            public Variable(Object? name)
+            public Token? Name { get; set; }
+            public Variable(Token? name)
             {
                   Name = name;
             }
