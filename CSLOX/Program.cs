@@ -77,7 +77,7 @@ namespace CSLOX
         {
             while (true)
             {
-                Console.WriteLine("> ");
+                Console.Write("> ");
                 string? line = Console.ReadLine();
                 if (line == null)
                 {
@@ -98,17 +98,20 @@ namespace CSLOX
             Scanner scanner = new(source);
             List<Token> tokens = scanner.ScanTokens();
 
+            // Adding EOF to avoid Exceptions.
+            tokens.Add(new Token(TokenType.EOF, "", "", -1));
+
             // Take the created list of tokents and pass them to the Parser.
             Parser parser = new Parser(tokens);
-            var expr = parser.Parse();
 
-            if (_hadErrors || expr == null)
+            var statements = parser.Parse();
+
+            if (_hadErrors || statements == null)
             {
                 return;
             }
 
-            _interpreter.Interpret(expr);
-            // Console.WriteLine(new AstPrinter().Print(expr!));
+            _interpreter.Interpret(statements);
         }
 
         public static void Error(int line, string message)

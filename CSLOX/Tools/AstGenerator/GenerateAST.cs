@@ -18,7 +18,16 @@
 //         "Grouping : Expr expression",
 //         "Literal  : Object value",
 //         "Unary    : Token oper, Expr right",
+//         "variable : Token name" 
 //     ]);
+
+// DefineAst(output_directory, "Stmt",
+//    [
+//        "Expression: Expr expression",
+//        "Print     : Expr expression",
+//        "Var       : Token name, Expr initializer"
+//    ]);
+//    
 
 // static void DefineAst(string outputDirectory, string baseName, List<string> types)
 // {

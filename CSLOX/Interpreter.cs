@@ -1,13 +1,15 @@
 namespace CSLOX
 {
-    public class Interpreter : IVisitor<Object>
+    public class Interpreter : IVisitorExpr<object>, IVisitorStmt<object?>
     {
-        public void Interpret(Expr expr)
+        public void Interpret(List<Stmt> statements)
         {
             try
             {
-                object value = Evaluate(expr);
-                Console.WriteLine(Stringify(value));
+                foreach (Stmt statement in statements)
+                {
+                    Execute(statement);
+                }
             }
             catch (RuntimeError er)
             {
@@ -119,6 +121,12 @@ namespace CSLOX
             return null!;
         }
 
+        public object? VisitExpressionStmt(Expression stmt)
+        {
+            Evaluate(stmt.Expre);
+            return null;
+        }
+
         private bool IsTruthy(object obj)
         {
             if (obj == null) return false;
@@ -130,7 +138,7 @@ namespace CSLOX
 
         private object Evaluate(Expr? expression)
         {
-            return expression!.Accept<object>(this);
+            return expression!.Accept(this);
         }
 
         private bool IsEaqual(object left, object right)
@@ -143,7 +151,7 @@ namespace CSLOX
 
         private void CheckNumberOperand(Token token, object operand)
         {
-            if (operand is Double)
+            if (operand is double)
             {
                 return;
             }
@@ -153,7 +161,7 @@ namespace CSLOX
 
         private void CheckNumberOperands(Token token, object left, object right)
         {
-            if (left is Double && right is Double)
+            if (left is double && right is double)
             {
                 return;
             }
@@ -181,7 +189,33 @@ namespace CSLOX
             return obj.ToString() ?? "";
         }
 
-        
+        // Statements Methods:
+
+        public object? VisitPrintStmt(Print stmt)
+        {
+            object val = Evaluate(stmt.Expre);
+            Console.WriteLine(Stringify(val));
+            return null;
+        }
+
+        public object? VisitVarStmt(Var stmt)
+        {
+            // Raziel: Work in Progress.
+            object? val = null;
+            if (stmt.Initializer != null)
+            {
+                val = Evaluate(stmt.Initializer);
+            }
+
+            return null;
+        }
+
+
+
+        private void Execute(Stmt statement)
+        {
+            statement.Accept(this);
+        }
 
         #region Runtime Error Class.
 

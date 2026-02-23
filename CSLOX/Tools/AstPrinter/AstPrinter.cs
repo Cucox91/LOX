@@ -3,7 +3,7 @@ using System.Text;
 
 namespace CSLOX
 {
-    public class AstPrinter : IVisitor<string>
+    public class AstPrinter : IVisitorExpr<string>
     {
         public string Print(Expr expr)
         {
@@ -12,12 +12,12 @@ namespace CSLOX
 
         public string VisitBinaryExpr(Binary expr)
         {
-            return Parentesis(expr.Oper.Lexeme, expr.Left, expr.Right);
+            return Parentesis(expr.Oper.Lexeme, expr.Left!, expr.Right!);
         }
 
         public string VisitGroupingExpr(Grouping expr)
         {
-            return Parentesis("group", expr.Expression);
+            return Parentesis("group", expr.Expression!);
         }
 
         public string VisitLiteralExpr(Literal expr)
@@ -31,8 +31,15 @@ namespace CSLOX
 
         public string VisitUnaryExpr(Unary expr)
         {
-            return Parentesis(expr.Oper.Lexeme, expr.Right);
+            return Parentesis(expr.Oper.Lexeme, expr.Right!);
         }
+
+        public string VisitVariableExpr(Variable expr)
+        {
+            // return Environment.Get(expr.Name);
+            return "";
+        }
+
 
         private string Parentesis(string name, params Expr[] exprs)
         {

@@ -221,7 +221,7 @@ namespace CSLOX
             // Or if we want to use the $"{}" Style, it should be here to.
 
             // Get the values inside the "" only. That is why we do +1 and -1.
-            string stringValue = _source.Substring(_start + 1, (_current - _start) - 1);
+            string stringValue = _source.Substring(_start + 1, (_current - _start) - 2);
             AddToken(TokenType.STRING, stringValue);
         }
 

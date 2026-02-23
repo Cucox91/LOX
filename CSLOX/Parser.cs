@@ -12,15 +12,35 @@ namespace CSLOX
             Tokens = tokens;
         }
 
-        public Expr? Parse()
+        public List<Stmt> Parse()
+        {
+            List<Stmt> statements = new List<Stmt>();
+
+            while (!IsAtEnd())
+            {
+                statements.Add(Declaration());
+            }
+
+            return statements;
+        }
+
+        private Stmt? Declaration()
         {
             try
             {
-                return Expression();
+                if (Match(TokenType.VAR))
+                {
+                    return VarDeclaration();
+                }
+
+                return Statement();
             }
-            catch (ParseError error)
+            catch (ParseError)
             {
-                Console.WriteLine(error.Message);
+                // We do nothing with the error above because this will  be synchronized and
+                // we don't want to show internal errors. Just the high level ones.
+
+                Synchronize();
                 return null;
             }
         }
@@ -161,6 +181,11 @@ namespace CSLOX
                 return new Literal(Previous().Literal);
             }
 
+            if (Match(TokenType.IDENTIFIER))
+            {
+                return new Variable(Previous());
+            }
+
             if (Match(TokenType.LEFT_PAREN))
             {
                 Expr? expr = Expression();
@@ -185,6 +210,47 @@ namespace CSLOX
         {
             Program.Error(token.Line, message);
             return new ParseError();
+        }
+
+
+        // Related to Statement:
+        private Stmt Statement()
+        {
+            if (Match(TokenType.PRINT))
+            {
+                return PrintStatement();
+            }
+
+            return ExpressionStatement();
+        }
+
+        private Stmt VarDeclaration()
+        {
+            Token name = Consume(TokenType.IDENTIFIER, "Exected Variable Name");
+
+            Expr? initializer = null;
+            if (Match(TokenType.EQUAL))
+            {
+                initializer = Expression();
+            }
+
+            Consume(TokenType.SEMICOLON, "Expected ';' after variable declaration.");
+
+            return new Var(name, initializer!);
+        }
+
+        private Stmt PrintStatement()
+        {
+            Expr? value = Expression();
+            Consume(TokenType.SEMICOLON, "Expect ';' after value.");
+            return new Print(value!);
+        }
+
+        private Stmt ExpressionStatement()
+        {
+            Expr? value = Expression();
+            Consume(TokenType.SEMICOLON, "Expect ';' after value.");
+            return new Expression(value!);
         }
 
         private void Synchronize()
