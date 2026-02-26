@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace CSLOX
 {
     public class Interpreter : IVisitorExpr<object>, IVisitorStmt<object?>
@@ -219,12 +221,40 @@ namespace CSLOX
             return null;
         }
 
+        public object VisitAssingExpr(Assing expr)
+        {
+            object val = Evaluate(expr.Value);
+            _environment.Assign(expr.Name, val);
+            return val;
+        }
+
+        public object? VisitBlockStmt(Block stmt)
+        {
+            ExecuteBlock(stmt.Statements, new Environm(_environment));
+            return null;
+        }
+
+        private void ExecuteBlock(List<Stmt?> statements, Environm environm)
+        {
+            Environm previous = this._environment;
+            try
+            {
+                this._environment = environm;
+                foreach (var stmt in statements)
+                {
+                    Execute(stmt!);
+                }
+            }
+            finally
+            {
+                this._environment = previous;
+            }
+        }
+
         private void Execute(Stmt statement)
         {
             statement.Accept(this);
         }
-
-
 
         #region Runtime Error Class.
 

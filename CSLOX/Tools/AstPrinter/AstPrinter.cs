@@ -10,6 +10,11 @@ namespace CSLOX
             return expr.Accept(this);
         }
 
+        public string VisitAssingExpr(Assing expr)
+        {
+            return "";
+        }
+
         public string VisitBinaryExpr(Binary expr)
         {
             return Parentesis(expr.Oper.Lexeme, expr.Left!, expr.Right!);

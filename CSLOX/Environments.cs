@@ -8,7 +8,19 @@ namespace CSLOX
 {
     public class Environm
     {
+        public Environm? Enclosing { get; set; }
+
         private Dictionary<string, object?> _values = new Dictionary<string, object?>();
+
+        public Environm()
+        {
+            Enclosing = null;
+        }
+
+        public Environm(Environm enclosing)
+        {
+            Enclosing = enclosing;
+        }
 
         public void Define(string name, object? value)
         {
@@ -20,6 +32,27 @@ namespace CSLOX
             if (_values.ContainsKey(name.Lexeme))
             {
                 return _values[name.Lexeme];
+            }
+
+            if (Enclosing != null)
+            {
+                return Enclosing.Get(name);
+            }
+
+            throw new RuntimeError(name, $"Undefined variable '{name.Lexeme}'.");
+        }
+
+        public void Assign(Token? name, object val)
+        {
+            if (_values.ContainsKey(name!.Lexeme))
+            {
+                _values[name.Lexeme] = val;
+            }
+
+            if (Enclosing != null)
+            {
+                Enclosing.Assign(name, val);
+                return;
             }
 
             throw new RuntimeError(name, $"Undefined variable '{name.Lexeme}'.");

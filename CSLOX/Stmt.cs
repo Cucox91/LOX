@@ -10,6 +10,8 @@ namespace CSLOX
         public T VisitExpressionStmt(Expression stmt);
         public T VisitPrintStmt(Print stmt);
         public T VisitVarStmt(Var stmt);
+
+        public T VisitBlockStmt(Block stmt);
     }
 
     public record Expression : Stmt
@@ -57,6 +59,21 @@ namespace CSLOX
         public override Expr Accept<Expr>(IVisitorStmt<Expr> visitor)
         {
             return visitor.VisitVarStmt(this);
+        }
+    }
+
+    public record Block : Stmt
+    {
+        public List<Stmt?> Statements { get; set; } = new List<Stmt?>();
+
+        public Block(List<Stmt?> stmts)
+        {
+            Statements = stmts;
+        }
+
+        public override Expr Accept<Expr>(IVisitorStmt<Expr> visitor)
+        {
+            return visitor.VisitBlockStmt(this);
         }
     }
 }

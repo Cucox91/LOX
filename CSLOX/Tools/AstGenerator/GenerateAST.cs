@@ -14,6 +14,7 @@
 
 // DefineAst(output_directory, "Expr",
 //     [
+//         "Assing   : Token name, Expr value",
 //         "Binary   : Expr left, Token oper, Expr right",
 //         "Grouping : Expr expression",
 //         "Literal  : Object value",
@@ -23,6 +24,7 @@
 
 // DefineAst(output_directory, "Stmt",
 //    [
+//        "Block     : List<Stmt> statements"
 //        "Expression: Expr expression",
 //        "Print     : Expr expression",
 //        "Var       : Token name, Expr initializer"

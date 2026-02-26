@@ -47,7 +47,29 @@ namespace CSLOX
 
         private Expr? Expression()
         {
-            return Equality();
+            return Assignment();
+            // return Equality();
+        }
+
+        private Expr? Assignment()
+        {
+            Expr expr = Equality()!;
+
+            if (Match(TokenType.EQUAL))
+            {
+                Token equalss = Previous();
+                Expr value = Assignment()!;
+
+                if (expr is Variable)
+                {
+                    Token name = (expr as Variable)!.Name!;
+                    return new Assing(name, value);
+                }
+
+                Error(equalss, "Invalid Assignment Target.");
+            }
+
+            return expr;
         }
 
         private Expr? Equality()
@@ -221,6 +243,11 @@ namespace CSLOX
                 return PrintStatement();
             }
 
+            if (Match(TokenType.LEFT_BRACE))
+            {
+                return new Block(Block()!);
+            }
+
             return ExpressionStatement();
         }
 
@@ -251,6 +278,20 @@ namespace CSLOX
             Expr? value = Expression();
             Consume(TokenType.SEMICOLON, "Expect ';' after value.");
             return new Expression(value!);
+        }
+
+        private List<Stmt?> Block()
+        {
+            List<Stmt?> statements = new List<Stmt?>();
+
+            while (!Check(TokenType.RIGHT_BRACE) && !IsAtEnd())
+            {
+                statements.Add(Declaration());
+            }
+
+            Consume(TokenType.RIGHT_BRACE, "Expected '}' after block.");
+
+            return statements;
         }
 
         private void Synchronize()

@@ -12,6 +12,7 @@ namespace CSLOX
             public T VisitLiteralExpr(Literal expr);
             public T VisitUnaryExpr(Unary expr);
             public T VisitVariableExpr(Variable expr);
+            public T VisitAssingExpr(Assing expr);
       }
 
       public record Binary : Expr
@@ -74,4 +75,20 @@ namespace CSLOX
             }
       }
 
+      public record Assing : Expr
+      {
+            public Token? Name { get; set; }
+            public Expr? Value { get; set; }
+
+            public Assing(Token? name, Expr? value)
+            {
+                  Name = name;
+                  Value = value;
+            }
+
+            public override Expr Accept<Expr>(IVisitorExpr<Expr> visitor)
+            {
+                  return visitor.VisitAssingExpr(this);
+            }
+      }
 }
