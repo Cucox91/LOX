@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Linq.Expressions;
 
 namespace CSLOX
@@ -53,7 +54,8 @@ namespace CSLOX
 
         private Expr? Assignment()
         {
-            Expr expr = Equality()!;
+            // Expr expr = Equality()!;
+            Expr expr = Or();
 
             if (Match(TokenType.EQUAL))
             {
@@ -69,6 +71,31 @@ namespace CSLOX
                 Error(equalss, "Invalid Assignment Target.");
             }
 
+            return expr;
+        }
+
+        private Expr Or()
+        {
+            Expr expr = And();
+            while (Match(TokenType.OR))
+            {
+                Token oper = Previous();
+                Expr right = And();
+                expr = new Logical(expr, oper, right);
+            }
+
+            return expr;
+        }
+
+        private Expr And()
+        {
+            Expr expr = Equality()!;
+            while (Match(TokenType.AND))
+            {
+                Token oper = Previous();
+                Expr? right = Equality();
+                expr = new Logical(expr, oper, right);
+            }
             return expr;
         }
 
@@ -238,6 +265,11 @@ namespace CSLOX
         // Related to Statement:
         private Stmt Statement()
         {
+            if (Match(TokenType.IF))
+            {
+                return IfStatement();
+            }
+
             if (Match(TokenType.PRINT))
             {
                 return PrintStatement();
@@ -249,6 +281,22 @@ namespace CSLOX
             }
 
             return ExpressionStatement();
+        }
+
+        private Stmt IfStatement()
+        {
+            Consume(TokenType.LEFT_PAREN, "Expect '(' after 'if'.");
+            Expr? condition = Expression();
+            Consume(TokenType.RIGHT_PAREN, "Expected ')' after 'if' condition");
+
+            Stmt? thenBranch = Statement();
+            Stmt? elseBranch = null;
+            if (Match(TokenType.ELSE))
+            {
+                elseBranch = Statement();
+            }
+
+            return new If(condition, thenBranch, elseBranch);
         }
 
         private Stmt VarDeclaration()

@@ -10,8 +10,9 @@ namespace CSLOX
         public T VisitExpressionStmt(Expression stmt);
         public T VisitPrintStmt(Print stmt);
         public T VisitVarStmt(Var stmt);
-
         public T VisitBlockStmt(Block stmt);
+        public T VisitIfStmt(If stmt);
+        public T VisitWhileStmt(While stmt);
     }
 
     public record Expression : Stmt
@@ -74,6 +75,42 @@ namespace CSLOX
         public override Expr Accept<Expr>(IVisitorStmt<Expr> visitor)
         {
             return visitor.VisitBlockStmt(this);
+        }
+    }
+
+    public record If : Stmt
+    {
+        public Expr? Condition { get; set; } = default;
+        public Stmt? ThenBranch { get; set; }
+        public Stmt? ElseBranch { get; set; }
+
+        public If(Expr? condition, Stmt? thenBranch, Stmt? elseBranch)
+        {
+            Condition = condition;
+            ThenBranch = thenBranch;
+            ElseBranch = elseBranch;
+        }
+
+        public override Expr Accept<Expr>(IVisitorStmt<Expr> visitor)
+        {
+            return visitor.VisitIfStmt(this);
+        }
+    }
+
+    public record While : Stmt
+    {
+        public Expr? Condition { get; set; }
+        public Stmt? Body { get; set; }
+
+        public While(Expr? condition, Stmt? body)
+        {
+            Condition = condition;
+            Body = body;
+        }
+
+        public override Expr Accept<Expr>(IVisitorStmt<Expr> visitor)
+        {
+            return visitor.VisitWhileStmt(this);
         }
     }
 }

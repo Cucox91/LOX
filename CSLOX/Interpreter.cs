@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace CSLOX
 {
     public class Interpreter : IVisitorExpr<object>, IVisitorStmt<object?>
@@ -254,6 +252,42 @@ namespace CSLOX
         private void Execute(Stmt statement)
         {
             statement.Accept(this);
+        }
+
+        public object? VisitIfStmt(If stmt)
+        {
+            if (IsTruthy(Evaluate(stmt.Condition)))
+            {
+                Execute(stmt.ThenBranch!);
+            }
+            else if (stmt.ElseBranch != null)
+            {
+                Execute(stmt.ElseBranch);
+            }
+
+            return null;
+        }
+
+        public object VisitLogicalExpr(Logical expr)
+        {
+            object left = Evaluate(expr.Left);
+
+            if (expr.Operator!.TokenType == TokenType.OR)
+            {
+                if (IsTruthy(left))
+                {
+                    return left;
+                }
+            }
+            else
+            {
+                if (!IsTruthy(left))
+                {
+                    return left;
+                }
+            }
+
+            return Evaluate(expr.Right);
         }
 
         #region Runtime Error Class.
