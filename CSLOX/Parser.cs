@@ -270,9 +270,19 @@ namespace CSLOX
                 return IfStatement();
             }
 
+            if (Match(TokenType.FOR))
+            {
+                return ForStatement();
+            }
+
             if (Match(TokenType.PRINT))
             {
                 return PrintStatement();
+            }
+
+            if (Match(TokenType.WHILE))
+            {
+                return WhileStatement();
             }
 
             if (Match(TokenType.LEFT_BRACE))
@@ -281,6 +291,75 @@ namespace CSLOX
             }
 
             return ExpressionStatement();
+        }
+
+        private Stmt ForStatement()
+        {
+            Consume(TokenType.LEFT_PAREN, "Expect '(' after the 'for'");
+
+            // Initializer (P1)
+            Stmt? initializer = null;
+            if (Match(TokenType.SEMICOLON))
+            {
+                initializer = null;
+            }
+            else if (Match(TokenType.VAR))
+            {
+                initializer = VarDeclaration();
+            }
+            else
+            {
+                initializer = ExpressionStatement();
+            }
+
+            // Condition (P2)
+            Expr? condition = null; ;
+            if (!Check(TokenType.SEMICOLON))
+            {
+                condition = Expression();
+            }
+
+            Consume(TokenType.SEMICOLON, "Expected ';' after loop condition.");
+
+            // Increment (P3)
+            Expr? increment = null;
+            if (!Check(TokenType.RIGHT_PAREN))
+            {
+                increment = Expression();
+            }
+
+            // Body (P4)
+            Stmt? body = Statement();
+
+            // Here we are desugaring. This meant that we will pass this as a while loop that we already have to the Interpreter.
+            // Here what we do is to Convert and build it. We are making the body the composition of the multiple parts.
+
+            if (increment != null)
+            {
+                body = new Block(new List<Stmt?> { body, new Expression(increment) });
+            }
+
+            if (condition == null)
+            {
+                condition = new Literal(true);
+            }
+            body = new While(condition, body);
+
+            if (initializer != null)
+            {
+                body = new Block(new List<Stmt?> { initializer, body });
+            }
+
+            return body;
+        }
+
+        private Stmt WhileStatement()
+        {
+            Consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'.");
+            Expr condition = Expression()!;
+            Consume(TokenType.RIGHT_PAREN, "Expect ')' after 'while'.");
+            Stmt body = Statement();
+            return new While(condition, body);
         }
 
         private Stmt IfStatement()

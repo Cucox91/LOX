@@ -34,6 +34,11 @@ namespace CSLOX
             return expr.Value.ToString() ?? "";
         }
 
+        public string VisitLogicalExpr(Logical expr)
+        {
+            return "";
+        }
+
         public string VisitUnaryExpr(Unary expr)
         {
             return Parentesis(expr.Oper.Lexeme, expr.Right!);
