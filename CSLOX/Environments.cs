@@ -47,6 +47,7 @@ namespace CSLOX
             if (_values.ContainsKey(name!.Lexeme))
             {
                 _values[name.Lexeme] = val;
+                return;
             }
 
             if (Enclosing != null)

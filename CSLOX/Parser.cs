@@ -327,6 +327,8 @@ namespace CSLOX
             {
                 increment = Expression();
             }
+            
+            Consume(TokenType.RIGHT_PAREN, "Expected ')' after loop increment.");
 
             // Body (P4)
             Stmt? body = Statement();

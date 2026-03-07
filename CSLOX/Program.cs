@@ -1,6 +1,4 @@
-﻿using System;
-using System.Text;
-using static CSLOX.Interpreter;
+﻿using static CSLOX.Interpreter;
 
 namespace CSLOX
 {
@@ -12,7 +10,7 @@ namespace CSLOX
 
         public static void Main(string[] args)
         {
-            // args = ["/home/cucox91/Repos/CSCode/LOX/CSLOX/Loops.lox"];
+            //args = ["/home/cucox91/Repos/CSCode/LOX/CSLOX/Loops.lox"];
             if (args.Length > 1)
             {
                 Console.WriteLine("Usage: jlox [script]");
