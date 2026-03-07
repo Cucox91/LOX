@@ -15,6 +15,7 @@ namespace CSLOX
             public T VisitAssingExpr(Assing expr);
 
             public T VisitLogicalExpr(Logical expr);
+            public T VisitCallExpr(Call expr);
       }
 
       public record Binary : Expr
@@ -110,6 +111,27 @@ namespace CSLOX
             public override Expr Accept<Expr>(IVisitorExpr<Expr> visitor)
             {
                   return visitor.VisitLogicalExpr(this);
+            }
+      }
+
+      public record Call : Expr
+      {
+            public Expr? Callee { get; set; }
+            public Token? Paren { get; set; }
+
+            public List<Expr?> Arguments { get; set; } = default!;
+
+
+            public Call(Expr? callee, Token? paren, List<Expr?> arguments)
+            {
+                  Callee = callee;
+                  Paren = paren;
+                  Arguments = arguments;
+            }
+
+            public override Expr Accept<Expr>(IVisitorExpr<Expr> visitor)
+            {
+                  return visitor.VisitCallExpr(this);
             }
       }
 }

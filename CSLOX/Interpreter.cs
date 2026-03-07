@@ -2,7 +2,14 @@ namespace CSLOX
 {
     public class Interpreter : IVisitorExpr<object>, IVisitorStmt<object?>
     {
-        private Environm _environment = new Environm();
+        public Environm Globals { get; set; } = default!;
+        private Environm _environment = default!;
+
+        public Interpreter()
+        {
+            _environment = Globals; // Raziel: check this, the assignemnt of global to envs. 
+            Globals.Define("Clock", new LoxCallableClock());
+        }
 
         public void Interpret(List<Stmt> statements)
         {
@@ -131,6 +138,30 @@ namespace CSLOX
         {
             // Raziel: Review nullability later on this.
             return _environment.Get(expr.Name!)!;
+        }
+
+        public object VisitCallExpr(Call expr)
+        {
+            object callee = Evaluate(expr.Callee);
+
+            List<object> arguments = new List<object>();
+            foreach (var arg in expr.Arguments)
+            {
+                arguments.Add(Evaluate(arg));
+            }
+
+            if (callee is not ILoxCallable)
+            {
+                throw new RuntimeError(expr.Paren!, "Can only call Functions and Classes.");
+            }
+
+            var function = (ILoxCallable)callee;
+            if (arguments.Count != function.Arity())
+            {
+                throw new RuntimeError(expr.Paren!, $"Expected {function.Arity()} arguments but got {arguments.Count}.");
+            }
+
+            return function.Call(this, arguments);
         }
 
         private bool IsTruthy(object obj)
@@ -316,5 +347,28 @@ namespace CSLOX
         }
 
         #endregion Runtime Error Class.
+
+        #region LoxCallableClock...
+
+        public class LoxCallableClock : ILoxCallable
+        {
+
+            public int Arity()
+            {
+                return 0;
+            }
+
+            public object Call(Interpreter interpreter, List<object> arguments)
+            {
+                return DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            }
+
+            public override string ToString()
+            {
+                return "<native fn>";
+            }
+        }
+
+        #endregion LoxCallableClock...
     }
 }

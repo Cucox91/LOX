@@ -13,6 +13,8 @@ namespace CSLOX
         public T VisitBlockStmt(Block stmt);
         public T VisitIfStmt(If stmt);
         public T VisitWhileStmt(While stmt);
+
+        public T VisitFunctionStmt(Function stmt);
     }
 
     public record Expression : Stmt
@@ -111,6 +113,25 @@ namespace CSLOX
         public override Expr Accept<Expr>(IVisitorStmt<Expr> visitor)
         {
             return visitor.VisitWhileStmt(this);
+        }
+    }
+
+    public record Function : Stmt
+    {
+        public Token? Name { get; set; }
+        public List<Token?> Parameters { get; set; } = default!;
+        public List<Stmt?> Body { get; set; } = default!;
+
+        public Function(Token? name, List<Token?> parameters, List<Stmt?> body)
+        {
+            Name = name;
+            Parameters = parameters;
+            Body = body;
+        }
+
+        public override Expr Accept<Expr>(IVisitorStmt<Expr> visitor)
+        {
+            return visitor.VisitFunctionStmt(this);
         }
     }
 }
