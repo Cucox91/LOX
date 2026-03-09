@@ -12,6 +12,7 @@ namespace CSLOX
         {
             // args = ["/home/cucox91/Repos/CSCode/LOX/CSLOX/Loops.lox"];
             args = ["/home/cucox91/Repos/CSCode/LOX/CSLOX/Functions.lox"];
+
             if (args.Length > 1)
             {
                 Console.WriteLine("Usage: jlox [script]");
@@ -107,6 +108,14 @@ namespace CSLOX
             var statements = parser.Parse();
 
             if (_hadErrors || statements == null)
+            {
+                return;
+            }
+
+            Resolver resolver = new Resolver(_interpreter);
+            resolver.Resolve(statements);
+
+            if (_hadErrors)
             {
                 return;
             }
