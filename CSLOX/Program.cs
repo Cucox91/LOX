@@ -10,7 +10,8 @@ namespace CSLOX
 
         public static void Main(string[] args)
         {
-            //args = ["/home/cucox91/Repos/CSCode/LOX/CSLOX/Loops.lox"];
+            // args = ["/home/cucox91/Repos/CSCode/LOX/CSLOX/Loops.lox"];
+            args = ["/home/cucox91/Repos/CSCode/LOX/CSLOX/Functions.lox"];
             if (args.Length > 1)
             {
                 Console.WriteLine("Usage: jlox [script]");

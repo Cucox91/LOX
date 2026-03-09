@@ -2,7 +2,7 @@ namespace CSLOX
 {
     public class Interpreter : IVisitorExpr<object>, IVisitorStmt<object?>
     {
-        public Environm Globals { get; set; } = default!;
+        public Environm Globals { get; set; } = new Environm()!;
         private Environm _environment = default!;
 
         public Interpreter()
@@ -267,7 +267,7 @@ namespace CSLOX
             return null;
         }
 
-        private void ExecuteBlock(List<Stmt?> statements, Environm environm)
+        public void ExecuteBlock(List<Stmt?> statements, Environm environm)
         {
             Environm previous = this._environment;
             try
@@ -332,6 +332,24 @@ namespace CSLOX
                 Execute(stmt.Body!);
             }
             return null;
+        }
+
+        public object? VisitFunctionStmt(Function stmt)
+        {
+            LoxFunction function = new LoxFunction(stmt, _environment);
+            _environment.Define(stmt!.Name!.Lexeme, function);
+            return null;
+        }
+
+        public object? VisitReturnStmt(Return stmt)
+        {
+            object? value = null;
+            if (stmt.Value != null)
+            {
+                value = Evaluate(stmt.Value);
+            }
+
+            throw new ReturnException(value);
         }
 
         #region Runtime Error Class.

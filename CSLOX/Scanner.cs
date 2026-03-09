@@ -280,7 +280,7 @@ namespace CSLOX
 
         private bool IsAlpha(char c)
         {
-            return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') && c == '_';
+            return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c == '_';
         }
 
         private bool IsAlphaNumeric(char c)

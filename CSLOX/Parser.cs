@@ -355,6 +355,11 @@ namespace CSLOX
                 return PrintStatement();
             }
 
+            if (Match(TokenType.RETURN))
+            {
+                return ReturnStatement();
+            }
+
             if (Match(TokenType.WHILE))
             {
                 return WhileStatement();
@@ -437,6 +442,21 @@ namespace CSLOX
             Consume(TokenType.RIGHT_PAREN, "Expect ')' after 'while'.");
             Stmt body = Statement();
             return new While(condition, body);
+        }
+
+        private Stmt ReturnStatement()
+        {
+            Token keyword = Previous();
+            Expr? value = null;
+
+            if (!Check(TokenType.SEMICOLON))
+            {
+                value = Expression();
+            }
+
+            Consume(TokenType.SEMICOLON, "Expected ';' after return value.");
+
+            return new Return(keyword, value);
         }
 
         private Stmt IfStatement()

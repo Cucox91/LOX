@@ -1,3 +1,6 @@
+using System.Reflection.Metadata.Ecma335;
+using System.Runtime.CompilerServices;
+
 namespace CSLOX
 {
     public abstract record Stmt
@@ -15,6 +18,8 @@ namespace CSLOX
         public T VisitWhileStmt(While stmt);
 
         public T VisitFunctionStmt(Function stmt);
+
+        public T VisitReturnStmt(Return stmt);
     }
 
     public record Expression : Stmt
@@ -132,6 +137,23 @@ namespace CSLOX
         public override Expr Accept<Expr>(IVisitorStmt<Expr> visitor)
         {
             return visitor.VisitFunctionStmt(this);
+        }
+    }
+
+    public record Return : Stmt
+    {
+        public Token? Keyword { get; set; }
+        public Expr? Value { get; set; }
+
+        public Return(Token? keywordParam, Expr? valueParam)
+        {
+            Keyword = keywordParam;
+            Value = valueParam;
+        }
+
+        public override Expr Accept<Expr>(IVisitorStmt<Expr> visitor)
+        {
+            return visitor.VisitReturnStmt(this);
         }
     }
 }

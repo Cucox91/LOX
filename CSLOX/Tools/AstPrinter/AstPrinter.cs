@@ -20,6 +20,11 @@ namespace CSLOX
             return Parentesis(expr.Oper.Lexeme, expr.Left!, expr.Right!);
         }
 
+        public string VisitCallExpr(Call expr)
+        {
+            return "";
+        }
+
         public string VisitGroupingExpr(Grouping expr)
         {
             return Parentesis("group", expr.Expression!);
