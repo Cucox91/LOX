@@ -52,7 +52,7 @@ namespace CSLOX
 
         public object VisitVariableExpr(Variable expr)
         {
-            if (_scopes.Count != 0 && _scopes.Peek()[expr.Name!.Lexeme] == false)
+            if (_scopes.Count != 0 && _scopes.Peek().ContainsKey(expr.Name!.Lexeme) && _scopes.Peek()[expr.Name!.Lexeme] == false)
             {
                 Program.Error(expr.Name.Line, "Can't Read Local variable in it's own initializer.");
             }

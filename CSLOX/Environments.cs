@@ -44,7 +44,8 @@ namespace CSLOX
 
         public object? GetAt(int distance, string name)
         {
-            return Ancestor(distance)._values[name];
+            Ancestor(distance)._values.TryGetValue(name, out object? result);
+            return result;
         }
 
         public void Assign(Token? name, object val)

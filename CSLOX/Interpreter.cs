@@ -6,8 +6,6 @@ namespace CSLOX
         private Environm _environment = default!;
         private Dictionary<Expr, int> _locals = new Dictionary<Expr, int>();
 
-        public Environm Globals { get; set; } = new Environm()!;
-
         public Interpreter()
         {
             _environment = Globals; // Raziel: check this, the assignemnt of global to envs. 
@@ -159,7 +157,12 @@ namespace CSLOX
         {
             if (_locals.TryGetValue(expr, out int distance))
             {
-                return _environment.GetAt(distance, name.Lexeme)!;
+                // Raziel: Verify this for global.
+                var result = _environment.GetAt(distance, name.Lexeme)!;
+                if (result != null)
+                {
+                    return result;
+                }
             }
 
             return Globals.Get(name)!;
@@ -167,7 +170,11 @@ namespace CSLOX
 
         public void Resolve(Expr expr, int depth)
         {
-            _locals.Add(expr, depth);
+            //Check if this break the recursions.
+            if (!_locals.TryAdd(expr, depth))
+            {
+                _locals[expr] = depth;
+            }
         }
 
         public void Interpret(List<Stmt> statements)
