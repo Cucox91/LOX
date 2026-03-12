@@ -12,6 +12,7 @@ namespace CSLOX
         {
             // args = ["/home/cucox91/Repos/CSCode/LOX/CSLOX/Loops.lox"];
             // args = ["/home/cucox91/Repos/CSCode/LOX/CSLOX/Functions.lox"];
+            args = ["/home/cucox91/Repos/CSCode/LOX/CSLOX/Classes.lox"];
 
             if (args.Length > 1)
             {

@@ -1,6 +1,3 @@
-using System.ComponentModel;
-using System.Linq.Expressions;
-
 namespace CSLOX
 {
     public class Parser
@@ -32,6 +29,10 @@ namespace CSLOX
                 if (Match(TokenType.FUN))
                 {
                     return FunctionDeclaration("function");
+                }
+                if (Match(TokenType.CLASS))
+                {
+                    return ClassDeclaration();
                 }
                 if (Match(TokenType.VAR))
                 {
@@ -502,6 +503,22 @@ namespace CSLOX
             Expr? value = Expression();
             Consume(TokenType.SEMICOLON, "Expect ';' after value.");
             return new Expression(value!);
+        }
+
+        private Stmt ClassDeclaration()
+        {
+            Token name = Consume(TokenType.IDENTIFIER, "Expect Class Name.");
+            Consume(TokenType.LEFT_BRACE, "Expect '{' before class body.");
+
+            List<Function> methods = new List<Function>();
+            while (!Check(TokenType.RIGHT_BRACE) && !IsAtEnd())
+            {
+                methods.Add(FunctionDeclaration("method")!);
+            }
+
+            Consume(TokenType.RIGHT_BRACE, "Expect '}' after class body.");
+
+            return new Class(name, null, methods);  // Raziel: For now I think Superclass will be null.
         }
 
         private List<Stmt?> Block()

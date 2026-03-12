@@ -1,0 +1,7 @@
+class TestClass {
+    serveOn() {
+        return "Scone";
+    }
+}
+
+print TestClass;

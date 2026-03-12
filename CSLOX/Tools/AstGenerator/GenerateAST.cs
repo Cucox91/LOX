@@ -26,7 +26,8 @@
 
 // DefineAst(output_directory, "Stmt",
 //    [
-//        "Block     : List<Stmt> statements"
+//        "Block     : List<Stmt> statements",
+//        "Class     : Token name, List<Stmt.Function> methods",
 //        "Expression: Expr expression",
 //        "Function  : Token name, List<Token> params," +
 //                   " List<Stmt> body",

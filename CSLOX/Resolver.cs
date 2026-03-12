@@ -244,6 +244,13 @@ namespace CSLOX
             return null!;
         }
 
+        public object VisitClassStmt(Class stmt)
+        {
+            Declare(stmt.Name!);
+            Define(stmt.Name!);
+            return null!;
+        }
+
         #endregion Useless Methods...
     }
 }
