@@ -103,6 +103,11 @@ namespace CSLOX
                     Token name = (expr as Variable)!.Name!;
                     return new Assing(name, value);
                 }
+                else if (expr is Get)
+                {
+                    Get get = (Get)expr;
+                    return new Set(get.ExprObject, get.Name, value);
+                }
 
                 Error(equalss, "Invalid Assignment Target.");
             }
@@ -265,6 +270,11 @@ namespace CSLOX
                 {
                     expr = FinishCall(expr);
                 }
+                else if (Match(TokenType.DOT))
+                {
+                    Token? name = Consume(TokenType.IDENTIFIER, "Expect property name after '.'.");
+                    expr = new Get(expr, name);
+                }
                 else
                 {
                     break;
@@ -300,17 +310,18 @@ namespace CSLOX
             if (Match(TokenType.FALSE)) return new Literal(false);
             if (Match(TokenType.TRUE)) return new Literal(true);
             if (Match(TokenType.NIL)) return new Literal(null);
-
             if (Match(TokenType.NUMBER, TokenType.STRING))
             {
                 return new Literal(Previous().Literal);
             }
-
+            if (Match(TokenType.THIS))
+            {
+                return new This(Previous());
+            }
             if (Match(TokenType.IDENTIFIER))
             {
                 return new Variable(Previous());
             }
-
             if (Match(TokenType.LEFT_PAREN))
             {
                 Expr? expr = Expression();

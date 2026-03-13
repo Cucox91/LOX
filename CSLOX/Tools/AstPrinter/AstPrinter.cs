@@ -25,6 +25,11 @@ namespace CSLOX
             return "";
         }
 
+        public string VisitGetExpr(Get expr)
+        {
+            return "";
+        }
+
         public string VisitGroupingExpr(Grouping expr)
         {
             return Parentesis("group", expr.Expression!);
@@ -40,6 +45,16 @@ namespace CSLOX
         }
 
         public string VisitLogicalExpr(Logical expr)
+        {
+            return "";
+        }
+
+        public string VisitSetExpr(Set expr)
+        {
+            return "";
+        }
+
+        public string VisitThisExpr(This expr)
         {
             return "";
         }

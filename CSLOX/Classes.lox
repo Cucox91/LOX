@@ -5,3 +5,17 @@ class TestClass {
 }
 
 print TestClass;
+
+var bagleTest = TestClass();
+
+print bagleTest;
+
+
+
+class Bacon {
+  eat() {
+    print "Crunch crunch crunch!";
+  }
+}
+
+Bacon().eat(); 

@@ -5,10 +5,20 @@ namespace CSLOX
         private enum FunctionType
         {
             NONE,
-            FUNCTION
+            FUNCTION,
+            METHOD,
+            INITIALIZER
+        }
+        private enum ClassType
+        {
+            NONE,
+            CLASS
         }
 
+
         private FunctionType _currentFuction = FunctionType.NONE;
+        private ClassType _currentClass = ClassType.NONE;
+
         private Stack<Dictionary<string, bool>> _scopes = new Stack<Dictionary<string, bool>>();
 
         public Interpreter InterpreterProp { get; set; }
@@ -157,8 +167,6 @@ namespace CSLOX
 
         #endregion Resolver Specific Methods...
 
-        #region Useless Methods...
-
         public object VisitBinaryExpr(Binary expr)
         {
             Resolve(expr.Left!);
@@ -226,6 +234,10 @@ namespace CSLOX
 
             if (stmt.Value != null)
             {
+                if (_currentFuction == FunctionType.INITIALIZER)
+                {
+                    Program.Error(stmt.Keyword!, "Can't return value from an Initializer");
+                }
                 Resolve(stmt.Value);
             }
             return null!;
@@ -246,11 +258,53 @@ namespace CSLOX
 
         public object VisitClassStmt(Class stmt)
         {
+            ClassType enclosingClass = _currentClass;
+            _currentClass = ClassType.CLASS;
+
             Declare(stmt.Name!);
             Define(stmt.Name!);
+
+            BeginScope();
+
+            _scopes.Peek().Add("this", true);
+            foreach (var item in stmt.Methods)
+            {
+                FunctionType declaration = FunctionType.METHOD;
+                if (item.Name!.Lexeme == "init")
+                {
+                    declaration = FunctionType.INITIALIZER;
+                }
+                ResolveFunction(item, declaration);
+            }
+
+            EndScope();
+
+            _currentClass = enclosingClass;
             return null!;
         }
 
-        #endregion Useless Methods...
+        public object VisitGetExpr(Get expr)
+        {
+            Resolve(expr.ExprObject!);
+            return null!;
+        }
+
+        public object VisitSetExpr(Set expr)
+        {
+            Resolve(expr.ExprObject!);
+            Resolve(expr.Value!);
+            return null!;
+        }
+
+        public object VisitThisExpr(This expr)
+        {
+            if (_currentClass == ClassType.NONE)
+            {
+                Program.Error(expr.Keyword!, "Can't use 'this' outside a class.");
+            }
+
+            ResolveLocal(expr, expr.Keyword!);
+            return null!;
+        }
     }
 }

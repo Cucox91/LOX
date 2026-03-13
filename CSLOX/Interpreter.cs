@@ -396,9 +396,46 @@ namespace CSLOX
         public object? VisitClassStmt(Class stmt)
         {
             _environment.Define(stmt.Name!.Lexeme, null);
-            LoxClass klass = new LoxClass(stmt.Name!.Lexeme);
+            Dictionary<string, LoxFunction> methods = new Dictionary<string, LoxFunction>();
+            foreach (var item in stmt.Methods)
+            {
+                LoxFunction func = new LoxFunction(item, _environment, item.Name!.Lexeme == "init");
+                methods.Add(item.Name!.Lexeme, func);
+            }
+
+            LoxClass klass = new LoxClass(stmt.Name!.Lexeme, methods);
             _environment.Assign(stmt.Name, klass);
             return null;
+        }
+
+        public object VisitGetExpr(Get expr)
+        {
+            object obj = Evaluate(expr.ExprObject!);
+            if (obj is LoxInstance)
+            {
+                return (obj as LoxInstance)!.Get(expr.Name!);
+            }
+
+            throw new RuntimeError(expr.Name!, "Only instances have properties.");
+        }
+
+        public object VisitSetExpr(Set expr)
+        {
+            object obj = Evaluate(expr.ExprObject);
+
+            if (obj is not LoxInstance)
+            {
+                throw new RuntimeError(expr.Name!, "Only instances have fields.");
+            }
+
+            object val = Evaluate(expr.Value);
+            ((LoxInstance)obj).Set(expr.Name!, val);
+            return val;
+        }
+
+        public object VisitThisExpr(This expr)
+        {
+            return LookupVariable(expr.Keyword!, expr);
         }
 
         #endregion Statements Methods...

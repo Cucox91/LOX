@@ -13,9 +13,11 @@ namespace CSLOX
             public T VisitUnaryExpr(Unary expr);
             public T VisitVariableExpr(Variable expr);
             public T VisitAssingExpr(Assing expr);
-
+            public T VisitGetExpr(Get expr);
+            public T VisitSetExpr(Set expr);
             public T VisitLogicalExpr(Logical expr);
             public T VisitCallExpr(Call expr);
+            public T VisitThisExpr(This expr);
       }
 
       public record Binary : Expr
@@ -44,8 +46,8 @@ namespace CSLOX
       }
       public record Literal : Expr
       {
-            public Object? Value { get; set; }
-            public Literal(Object? value)
+            public object? Value { get; set; }
+            public Literal(object? value)
             {
                   Value = value;
             }
@@ -132,6 +134,57 @@ namespace CSLOX
             public override Expr Accept<Expr>(IVisitorExpr<Expr> visitor)
             {
                   return visitor.VisitCallExpr(this);
+            }
+      }
+
+      public record Get : Expr
+      {
+            public Expr? ExprObject { get; set; }
+            public Token? Name { get; set; }
+
+            public Get(Expr? exprObj, Token? name)
+            {
+                  Name = name;
+                  ExprObject = exprObj;
+            }
+
+            public override Expr Accept<Expr>(IVisitorExpr<Expr> visitor)
+            {
+                  return visitor.VisitGetExpr(this);
+            }
+      }
+
+      public record Set : Expr
+      {
+            public Expr? ExprObject { get; set; }
+            public Token? Name { get; set; }
+            public Expr? Value { get; set; }
+
+            public Set(Expr? exprObject, Token? name, Expr? value)
+            {
+                  ExprObject = exprObject;
+                  Name = name;
+                  Value = value;
+            }
+
+            public override Expr Accept<Expr>(IVisitorExpr<Expr> visitor)
+            {
+                  return visitor.VisitSetExpr(this);
+            }
+      }
+
+      public record This : Expr
+      {
+            public Token? Keyword { get; set; }
+
+            public This(Token? keyword)
+            {
+                  Keyword = keyword;
+            }
+
+            public override Expr Accept<Expr>(IVisitorExpr<Expr> visitor)
+            {
+                  return visitor.VisitThisExpr(this);
             }
       }
 }
