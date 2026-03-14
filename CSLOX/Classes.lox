@@ -19,3 +19,34 @@ class Bacon {
 }
 
 Bacon().eat(); 
+
+
+
+
+class Doughnut {
+  // General doughnut stuff...
+}
+
+class BostonCream < Doughnut {
+  // Boston Cream-specific stuff...
+}
+
+class A {
+  method() {
+    print "A method";
+  }
+}
+
+class B < A {
+  method() {
+    print "B method";
+  }
+
+  test() {
+    super.method();
+  }
+}
+
+class C < B {}
+
+C().test();

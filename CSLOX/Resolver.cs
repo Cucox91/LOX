@@ -12,7 +12,8 @@ namespace CSLOX
         private enum ClassType
         {
             NONE,
-            CLASS
+            CLASS,
+            SUBCLASS
         }
 
 
@@ -80,6 +81,7 @@ namespace CSLOX
         }
 
         #endregion Useful Nodes for resolver...
+
 
         #region Resolver Specific Methods...
 
@@ -264,6 +266,23 @@ namespace CSLOX
             Declare(stmt.Name!);
             Define(stmt.Name!);
 
+            if (stmt.SuperClass != null && stmt.Name!.Lexeme == stmt.SuperClass.Name!.Lexeme)
+            {
+                Program.Error(stmt.SuperClass.Name, "A class can't inherit from itself.");
+            }
+
+            if (stmt.SuperClass != null)
+            {
+                _currentClass = ClassType.SUBCLASS;
+                Resolve(stmt.SuperClass);
+            }
+
+            if (stmt.SuperClass != null)
+            {
+                BeginScope();
+                Resolve(stmt.SuperClass);
+            }
+
             BeginScope();
 
             _scopes.Peek().Add("this", true);
@@ -277,7 +296,13 @@ namespace CSLOX
                 ResolveFunction(item, declaration);
             }
 
+
             EndScope();
+
+            if (stmt.SuperClass != null)
+            {
+                EndScope();
+            }
 
             _currentClass = enclosingClass;
             return null!;
@@ -301,6 +326,21 @@ namespace CSLOX
             if (_currentClass == ClassType.NONE)
             {
                 Program.Error(expr.Keyword!, "Can't use 'this' outside a class.");
+            }
+
+            ResolveLocal(expr, expr.Keyword!);
+            return null!;
+        }
+
+        public object VisitSuperExpr(Super expr)
+        {
+            if (_currentClass == ClassType.NONE)
+            {
+                Program.Error(expr.Keyword!, "Can't use 'super' outside a class.");
+            }
+            else if (_currentClass != ClassType.SUBCLASS)
+            {
+                Program.Error(expr.Keyword!, "Can't use 'super' in a class without a superclass.");
             }
 
             ResolveLocal(expr, expr.Keyword!);

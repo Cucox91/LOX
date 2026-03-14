@@ -395,7 +395,24 @@ namespace CSLOX
 
         public object? VisitClassStmt(Class stmt)
         {
+            object? superClass = null;
+            if (stmt.SuperClass != null)
+            {
+                superClass = Evaluate(stmt.SuperClass);
+                if (superClass is not LoxClass)
+                {
+                    throw new RuntimeError(stmt.SuperClass.Name!, "Superclass must be a class.");
+                }
+            }
+
             _environment.Define(stmt.Name!.Lexeme, null);
+
+            if (stmt.SuperClass != null)
+            {
+                _environment = new Environm(_environment);
+                _environment.Define("super", superClass);
+            }
+
             Dictionary<string, LoxFunction> methods = new Dictionary<string, LoxFunction>();
             foreach (var item in stmt.Methods)
             {
@@ -403,7 +420,13 @@ namespace CSLOX
                 methods.Add(item.Name!.Lexeme, func);
             }
 
-            LoxClass klass = new LoxClass(stmt.Name!.Lexeme, methods);
+            LoxClass klass = new LoxClass(stmt.Name!.Lexeme, (LoxClass?)superClass!, methods);
+
+            if (stmt.SuperClass != null)
+            {
+                _environment = _environment.Enclosing!;
+            }
+
             _environment.Assign(stmt.Name, klass);
             return null;
         }
@@ -436,6 +459,22 @@ namespace CSLOX
         public object VisitThisExpr(This expr)
         {
             return LookupVariable(expr.Keyword!, expr);
+        }
+
+        public object VisitSuperExpr(Super expr)
+        {
+            _locals.TryGetValue(expr, out int distance);
+            var superClass = (LoxClass)_environment.GetAt(distance, "super")!;
+
+            LoxInstance obj = (LoxInstance)_environment.GetAt(distance - 1, "this")!;
+            LoxFunction? method = superClass.FindMethod(expr.Method!.Lexeme);
+
+            if(method == null)
+            {
+                throw new RuntimeError(expr.Method, $"Undefined Property '{expr.Method.Lexeme}'.");
+            }
+
+            return method.Bind(obj);
         }
 
         #endregion Statements Methods...

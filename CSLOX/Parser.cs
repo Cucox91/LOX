@@ -314,6 +314,13 @@ namespace CSLOX
             {
                 return new Literal(Previous().Literal);
             }
+            if (Match(TokenType.SUPER))
+            {
+                Token keyword = Previous();
+                Consume(TokenType.DOT, "Expect '.' after 'super'.");
+                Token method = Consume(TokenType.IDENTIFIER, "Expected SuperClass Method Name");
+                return new Super(keyword, method);
+            }
             if (Match(TokenType.THIS))
             {
                 return new This(Previous());
@@ -519,6 +526,14 @@ namespace CSLOX
         private Stmt ClassDeclaration()
         {
             Token name = Consume(TokenType.IDENTIFIER, "Expect Class Name.");
+
+            Variable? superclass = null;
+            if (Match(TokenType.LESS))
+            {
+                Consume(TokenType.IDENTIFIER, "Expect Superclass name.");
+                superclass = new Variable(Previous());
+            }
+
             Consume(TokenType.LEFT_BRACE, "Expect '{' before class body.");
 
             List<Function> methods = new List<Function>();
@@ -528,8 +543,7 @@ namespace CSLOX
             }
 
             Consume(TokenType.RIGHT_BRACE, "Expect '}' after class body.");
-
-            return new Class(name, null, methods);  // Raziel: For now I think Superclass will be null.
+            return new Class(name, superclass, methods);
         }
 
         private List<Stmt?> Block()

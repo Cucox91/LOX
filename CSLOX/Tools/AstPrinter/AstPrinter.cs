@@ -1,4 +1,3 @@
-using System.Buffers;
 using System.Text;
 
 namespace CSLOX
@@ -50,6 +49,11 @@ namespace CSLOX
         }
 
         public string VisitSetExpr(Set expr)
+        {
+            return "";
+        }
+
+        public string VisitSuperExpr(Super expr)
         {
             return "";
         }

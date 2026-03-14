@@ -19,6 +19,7 @@
 //         "Call     : Expr callee, Token paren, List<Expr> arguments",
 //         "Get      : Expr object, Token name",
 //         "Set      : Expr object, Token name, Expr value",
+//         "Super    : Token keyword, Token method",
 //         "Grouping : Expr expression",
 //         "Literal  : Object value",
 //         "Logical  : Expr left, Token oper, Expr right",
@@ -30,6 +31,8 @@
 // DefineAst(output_directory, "Stmt",
 //    [
 //        "Block     : List<Stmt> statements",
+//        "Class     : Token name, Expr.Variable superclass," +
+//                   " List<Stmt.Function> methods",
 //        "Class     : Token name, List<Stmt.Function> methods",
 //        "Expression: Expr expression",
 //        "Function  : Token name, List<Token> params," +

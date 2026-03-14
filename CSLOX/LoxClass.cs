@@ -4,6 +4,7 @@ namespace CSLOX
     {
         public string Name { get; set; } = default!;
         public Dictionary<string, LoxFunction> Methods { get; set; } = new Dictionary<string, LoxFunction>();
+        public LoxClass? SuperClass { get; set; } = default!;
 
         public LoxClass(string name)
         {
@@ -14,6 +15,14 @@ namespace CSLOX
         {
             Name = name;
             Methods = methods;
+        }
+
+
+        public LoxClass(string name, LoxClass? superClass, Dictionary<string, LoxFunction> methods)
+        {
+            Name = name;
+            Methods = methods;
+            SuperClass = superClass;
         }
 
         public override string ToString()
@@ -48,6 +57,12 @@ namespace CSLOX
         public LoxFunction? FindMethod(string lexeme)
         {
             Methods.TryGetValue(lexeme, out LoxFunction? val);
+
+            if (SuperClass != null && val == null) // Check the null part first. It shoul be to return the child method first.
+            {
+                SuperClass.Methods.TryGetValue(lexeme, out val);
+            }
+
             return val;
         }
     }

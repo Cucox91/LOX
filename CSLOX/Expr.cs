@@ -18,6 +18,7 @@ namespace CSLOX
             public T VisitLogicalExpr(Logical expr);
             public T VisitCallExpr(Call expr);
             public T VisitThisExpr(This expr);
+            public T VisitSuperExpr(Super expr);
       }
 
       public record Binary : Expr
@@ -185,6 +186,23 @@ namespace CSLOX
             public override Expr Accept<Expr>(IVisitorExpr<Expr> visitor)
             {
                   return visitor.VisitThisExpr(this);
+            }
+      }
+
+      public record Super : Expr
+      {
+            public Token? Keyword { get; set; }
+            public Token? Method { get; set; }
+
+            public Super(Token? keyword, Token? method)
+            {
+                  Keyword = keyword;
+                  Method = method;
+            }
+
+            public override Expr Accept<Expr>(IVisitorExpr<Expr> visitor)
+            {
+                  return visitor.VisitSuperExpr(this);
             }
       }
 }
