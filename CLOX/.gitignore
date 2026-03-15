@@ -1,0 +1,90 @@
+# =========================
+# Build artifacts
+# =========================
+
+build/
+bin/
+out/
+dist/
+
+*.o
+*.obj
+*.so
+*.a
+*.lib
+*.dll
+*.dylib
+
+# executables
+*.exe
+*.out
+*.app
+clox
+
+# =========================
+# Debugger / profiling
+# =========================
+
+*.dSYM/
+*.stackdump
+*.core
+core
+gmon.out
+
+# =========================
+# Temporary files
+# =========================
+
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# =========================
+# OS files
+# =========================
+
+.DS_Store
+Thumbs.db
+
+# =========================
+# Logs
+# =========================
+
+*.log
+
+# =========================
+# VS Code
+# =========================
+
+.vscode/*
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# =========================
+# CMake (if you ever add it)
+# =========================
+
+CMakeFiles/
+CMakeCache.txt
+compile_commands.json
+cmake_install.cmake
+Makefile
+
+# =========================
+# Testing / coverage
+# =========================
+
+*.gcda
+*.gcno
+*.gcov
+coverage/
+
+# =========================
+# Static analysis
+# =========================
+
+*.plist
