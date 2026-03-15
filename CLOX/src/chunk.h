@@ -2,11 +2,13 @@
 #define clox_chunk_h
 
 #include "common.h"
+#include "value.h"
 
 // Here we define the one-byte Operation Codes.
 typedef enum
 {
-    OP_RETURN, // Return from Current Function.
+    OP_CONSTANT, // Produce a Constant. (2B)
+    OP_RETURN,   // Return from Current Function. (1B)
 } OpCode;
 
 // This struct will be a dynamic array of chunks of code.
@@ -15,11 +17,14 @@ typedef struct
     int count;
     int capacity;
     uint8_t *code;
+    int *lines;
+    ValueArray constants;
 } Chunk;
 
 void initChunk(Chunk *chunk);
-
-void writeChunk(Chunk *chunk, uint8_t byte);
+void writeChunk(Chunk *chunk, uint8_t byte, int line);
 void freeChunk(Chunk *chunk);
+
+int addConstant(Chunk *chunk, Value value);
 
 #endif
