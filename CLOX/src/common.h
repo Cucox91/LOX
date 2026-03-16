@@ -5,7 +5,6 @@
 #include <stddef.h>         // To have "NULL" available.
 #include <stdint.h>         // This is to have common "uint8_t".
 
-
-
+#define DEBUG_TRACE_EXECUTION
 
 #endif
