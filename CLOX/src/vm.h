@@ -2,6 +2,7 @@
 #define clox_vm_h
 
 #include "chunk.h"
+#include "value.h"
 
 #define STACK_MAX 256
 
@@ -29,6 +30,9 @@ typedef enum
 
 void initVM();
 void freeVM();
+
+void push(Value value);
+Value pop();
 
 InterpretResult interpret(Chunk *cshunk);
 

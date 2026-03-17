@@ -9,6 +9,12 @@ typedef enum
 {
     OP_CONSTANT, // Produce a Constant. (2B)
     OP_RETURN,   // Return from Current Function. (1B)
+    OP_NEGATE,   // Negate a Value (1B)
+    // Arithmetic Operators
+    OP_ADD,
+    OP_SUBTRACT,
+    OP_MULTIPLY,
+    OP_DIVIDE,
 } OpCode;
 
 // This struct will be a dynamic array of chunks of code.
