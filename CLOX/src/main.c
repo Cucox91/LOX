@@ -1,41 +1,102 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "common.h"
-#include "chunk.h"
-#include "debug.h"
 #include "vm.h"
+
+static void repl()
+{
+    char line[1024];
+    for (;;)
+    {
+        printf("> ");
+
+        if (!fgets(line, sizeof(line), stdin))
+        {
+            printf("\n");
+            break;
+        }
+
+        interpret(line);
+    }
+}
+
+static char *readFile(const char *path)
+{
+    // Open the file.
+    FILE *file = fopen(path, "rb");
+
+    if (file == NULL)
+    {
+        fprintf(stderr, "Could not open file \"%s\".\n", path);
+        exit(74);
+    }
+
+    // The next three line read the file and give us the size of it
+    // then proceed to reset the cursor to the begin of the file.
+    fseek(file, 0L, SEEK_END);
+    size_t fileSize = ftell(file);
+    rewind(file);
+
+    // We create a buffer with the size of the file plus 1 to store the
+    // EOF/NULL BYTE at the end of the buffer.
+    // Then we proceed to read the file and attach the
+    // EOF/NULL BYTE at the end of the buffer.
+
+    char *buffer = (char *)malloc(fileSize + 1);
+
+    // This verify if there is enough memory available for the file.
+    if (buffer == NULL)
+    {
+        fprintf(stderr, "Not enough memory to read \"%s\".\n", path);
+    }
+
+    size_t bytesRead = fread(buffer, sizeof(char), fileSize, file);
+
+    // If fails when reading the file.
+    if (bytesRead < fileSize)
+    {
+        fprintf(stderr, "Could not read file \"%s\".\n", path);
+    }
+
+    buffer[bytesRead] = '\0';
+
+    // We close the file and release the memory. And return the buffer data.
+    fclose(file);
+    return buffer;
+}
+
+static void runFile(const char *path)
+{
+    char *source = readFile(path);
+    InterpretResult result = interpret(source);
+    free(source);
+
+    if (result == INTERPRET_COMPILE_ERROR)
+        exit(65);
+    if (result == INTERPRET_RUNTIME_ERROR)
+        exit(70);
+}
 
 int main(int argc, const char *argv[])
 {
     initVM();
 
-    Chunk chunk;
-    initChunk(&chunk);
+    if (argc == 1)
+    {
+        repl();
+    }
+    else if (argc == 2)
+    {
+        runFile(argv[1]);
+    }
+    else
+    {
+        fprintf(stderr, "Usage: clox [path]\n");
+        exit(64);
+    }
 
-    // This is a two-byte instruction. Added one by one.
-    int constant = addConstant(&chunk, 1.2); // Add and get the index.
-    writeChunk(&chunk, OP_CONSTANT, 123);    // Say is a Constant.
-    writeChunk(&chunk, constant, 123);       // Save the index.
-
-    // Large Arithmetic Operation
-
-    constant = addConstant(&chunk, 3.4);
-    writeChunk(&chunk, OP_CONSTANT, 123);
-    writeChunk(&chunk, constant, 123);
-
-    writeChunk(&chunk, OP_ADD, 123);
-
-    constant = addConstant(&chunk, 5.6);
-    writeChunk(&chunk, OP_CONSTANT, 123);
-    writeChunk(&chunk, constant, 123);
-
-    writeChunk(&chunk, OP_DIVIDE, 123);
-
-    writeChunk(&chunk, OP_NEGATE, 123);
-    writeChunk(&chunk, OP_RETURN, 123);
-
-    disassembleChunk(&chunk, "Test Chunk");
-    interpret(&chunk);
     freeVM();
-    freeChunk(&chunk);
-
     return 0;
 }

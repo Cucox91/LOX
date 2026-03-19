@@ -10,7 +10,8 @@ typedef enum
     OP_CONSTANT, // Produce a Constant. (2B)
     OP_RETURN,   // Return from Current Function. (1B)
     OP_NEGATE,   // Negate a Value (1B)
-    // Arithmetic Operators
+
+    // Arithmetic Operators (1B yes!)
     OP_ADD,
     OP_SUBTRACT,
     OP_MULTIPLY,
