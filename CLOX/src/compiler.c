@@ -142,6 +142,81 @@ static void endCompiler()
 #endif
 }
 
+// Declaration to avoid compilation order issues.
+static void expression();
+static ParseRule *getRule(TokenType type);
+static void parsePrecedence(Precedence precedence);
+
+static void binary()
+{
+    TokenType operatorType = parser.previous.type;
+    ParseRule *rule = getRule(operatorType);
+    parsePrecedence((Precedence)(rule->precedence + 1));
+
+    switch (operatorType)
+    {
+    case TOKEN_PLUS:
+        emitByte(OP_ADD);
+        break;
+    case TOKEN_MINUS:
+        emitByte(OP_SUBTRACT);
+        break;
+    case TOKEN_STAR:
+        emitByte(OP_MULTIPLY);
+        break;
+    case TOKEN_SLASH:
+        emitByte(OP_DIVIDE);
+        break;
+    default:
+        return;
+    }
+}
+
+static void unary()
+{
+    TokenType operatorType = parser.previous.type;
+
+    parsePrecedence(PREC_UNARY);
+
+    switch (operatorType)
+    {
+    case TOKEN_MINUS:
+        emitByte(OP_NEGATE);
+        break;
+    default:
+        return;
+    }
+}
+
+static uint8_t makeConstant(Value value)
+{
+    int constant = addConstant(currentChunk(), value);
+    if (constant > UINT8_MAX)
+    {
+        error("Too many constants in one chunk.");
+        return 0;
+    }
+    return (uint8_t)constant;
+}
+
+static void emitConstant(Value value)
+{
+    emitBytes(OP_CONSTANT, makeConstant(value));
+}
+
+static void number()
+{
+    // Convert a string to a floating point.
+    double value = strtod(parser.previous.start, NULL);
+    emitConstant(value);
+}
+
+static void grouping()
+{
+    expression();
+    consume(TOKEN_RIGHT_PAREN, "Expected ')' after expression.");
+}
+
 ParseRule rules[] = {
     [TOKEN_LEFT_PAREN] = {grouping, NULL, PREC_NONE},
     [TOKEN_RIGHT_PAREN] = {NULL, NULL, PREC_NONE},
@@ -213,76 +288,6 @@ static void parsePrecedence(Precedence precedence)
 static void expression()
 {
     parsePrecedence(PREC_ASSIGNMENT);
-}
-
-static void binary()
-{
-    TokenType operatorType = parser.previous.type;
-    ParseRule *rule = getRule(operatorType);
-    parsePrecedence((Precedence)(rule->precedence + 1));
-
-    switch (operatorType)
-    {
-    case TOKEN_PLUS:
-        emitByte(OP_ADD);
-        break;
-    case TOKEN_MINUS:
-        emitByte(OP_SUBTRACT);
-        break;
-    case TOKEN_STAR:
-        emitByte(OP_MULTIPLY);
-        break;
-    case TOKEN_SLASH:
-        emitByte(OP_DIVIDE);
-        break;
-    default:
-        return;
-    }
-}
-
-static void unary()
-{
-    TokenType operatorType = parser.previous.type;
-
-    parsePrecedence(PREC_UNARY);
-
-    switch (operatorType)
-    {
-    case TOKEN_MINUS:
-        emitByte(OP_NEGATE);
-        break;
-    default:
-        return;
-    }
-}
-
-static void grouping()
-{
-    expression();
-    consume(TOKEN_RIGHT_PAREN, "Expected ')' after expression.");
-}
-
-static uint8_t makeConstant(Value value)
-{
-    int constant = addConstant(currentChunk(), value);
-    if (constant > UINT8_MAX)
-    {
-        error("Too many constants in one chunk.");
-        return 0;
-    }
-    return (uint8_t)constant;
-}
-
-static void emitConstant(Value value)
-{
-    emitBytes(OP_CONSTANT, makeConstant(value));
-}
-
-static void number()
-{
-    // Convert a string to a floating point.
-    double value = strtod(parser.previous.start, NULL);
-    emitConstant(value);
 }
 
 bool compile(const char *source, Chunk *chunk)

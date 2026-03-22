@@ -134,7 +134,7 @@ static Token string()
     return makeToken(TOKEN_STRING);
 }
 
-static isDigit(char c)
+static bool isDigit(char c)
 {
     return c >= '0' && c <= '9';
 }
@@ -231,19 +231,19 @@ static TokenType identifierType()
     return TOKEN_IDENTIFIER;
 }
 
+static bool isAlpha(char c)
+{
+    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
+}
+
 static Token identifier()
 {
-    while (IsAlpha(peek()) || isDigit(peek()))
+    while (isAlpha(peek()) || isDigit(peek()))
     {
         advance();
     }
 
     return makeToken(identifierType());
-}
-
-static bool IsAlpha(char c)
-{
-    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == "_";
 }
 
 Token scanToken()
