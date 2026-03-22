@@ -6,6 +6,10 @@
 #include "scanner.h"
 #include "vm.h"
 
+#ifdef DEBUG_PRINT_CODE
+#include "debug.h"
+#endif
+
 typedef enum
 {
     PREC_NONE,       // This is sorted from lowest to highest. Precedence.
@@ -127,6 +131,15 @@ static void emitReturn()
 static void endCompiler()
 {
     emitReturn();
+
+#ifdef DEBUG_PRINT_CODE
+
+    if (!parser.hadError)
+    {
+        disassembleChunk(currentChunk(), "code");
+    }
+
+#endif
 }
 
 ParseRule rules[] = {
@@ -174,6 +187,32 @@ ParseRule rules[] = {
 
 static ParseRule *getRule(TokenType type)
 {
+    return &rules[type];
+}
+
+static void parsePrecedence(Precedence precedence)
+{
+    advance();
+    ParseFn prefixRule = getRule(parser.previous.type)->prefix;
+    if (prefixRule == NULL)
+    {
+        error("Exprect Expression.");
+        return;
+    }
+
+    prefixRule(); // Will execute the function.This is a ptr to a function.
+
+    while (precedence <= getRule(parser.current.type)->precedence)
+    {
+        advance();
+        ParseFn infixRule = getRule(parser.previous.type)->infix;
+        infixRule();
+    }
+}
+
+static void expression()
+{
+    parsePrecedence(PREC_ASSIGNMENT);
 }
 
 static void binary()
@@ -199,10 +238,6 @@ static void binary()
     default:
         return;
     }
-}
-
-static void parsePrecedence(Precedence precedence)
-{
 }
 
 static void unary()
@@ -248,19 +283,6 @@ static void number()
     // Convert a string to a floating point.
     double value = strtod(parser.previous.start, NULL);
     emitConstant(value);
-}
-
-static void expression()
-{
-    /*
-    For now we are going to handle only these following:
-    Number literals: 123
-    Parentheses for grouping: (123)
-    Unary negation: -123
-    The Four Horsemen of the Arithmetic: +, -, *, /
-    */
-
-    parsePrecedence(PREC_ASSIGNMENT);
 }
 
 bool compile(const char *source, Chunk *chunk)
