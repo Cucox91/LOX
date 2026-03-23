@@ -165,7 +165,7 @@ static TokenType checkKeyword(
     TokenType type)
 {
     if (scanner.current - scanner.start == start + length &&
-        memcmp(scanner.start + start, rest, length))
+        memcmp(scanner.start + start, rest, length) == 0)
     {
         return type;
     }

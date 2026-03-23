@@ -11,6 +11,19 @@ typedef enum
     OP_RETURN,   // Return from Current Function. (1B)
     OP_NEGATE,   // Negate a Value (1B)
 
+    // Literals Operators (1B Yes too!)
+    OP_NIL,
+    OP_TRUE,
+    OP_FALSE,
+
+    // Comparison
+    OP_EQUAL,
+    OP_GREATER,
+    OP_LESS,
+
+    // Logical
+    OP_NOT,
+
     // Arithmetic Operators (1B yes!)
     OP_ADD,
     OP_SUBTRACT,
